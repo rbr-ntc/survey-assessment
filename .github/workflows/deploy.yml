@@ -8,6 +8,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+      FRONTEND_API_URL: ${{ secrets.FRONTEND_API_URL }}
+      API_KEY: ${{ secrets.API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
 
     steps:
       - name: Checkout code
@@ -70,9 +80,9 @@ jobs:
             # Создаем .env файл для production
             cat > .env << EOF
             MONGO_URL=mongodb://mongo:27017/assessment
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            API_KEY=${{ secrets.API_KEY }}
-            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+            OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
+            API_KEY=${{ env.API_KEY }}
+            CORS_ORIGINS=${{ env.CORS_ORIGINS }}
             EOF
 
             # Создаем docker-compose.prod.yml для production
@@ -88,31 +98,33 @@ jobs:
                 volumes:
                   - mongo_data:/data/db
                   - ./mongo-init:/docker-entrypoint-initdb.d
-                
+                environment:
+                  - MONGO_INITDB_DATABASE=assessment
+
               backend:
-                image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
+                image: ${{ env.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
                 restart: always
                 environment:
                   - MONGO_URL=mongodb://mongo:27017/assessment
-                  - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+                  - CORS_ORIGINS=${{ env.CORS_ORIGINS }}
+                  - API_KEY=${{ env.API_KEY }}
+                  - OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
                 ports:
                   - "8000:8000"
                 depends_on:
                   - mongo
-                env_file:
-                  - ./.env
-                
+
               frontend:
-                image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
+                image: ${{ env.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
                 restart: always
                 environment:
-                  - NEXT_PUBLIC_API_URL=${{ secrets.FRONTEND_API_URL }}
-                  - NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
+                  - NEXT_PUBLIC_API_URL=${{ env.FRONTEND_API_URL }}
+                  - NEXT_PUBLIC_API_KEY=${{ env.API_KEY }}
                 ports:
                   - "3000:3000"
                 depends_on:
                   - backend
-                
+
             volumes:
               mongo_data:
             EOF
