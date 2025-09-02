@@ -15,9 +15,9 @@ class Question(BaseModel):
     options: List[Option]
 
 class UserInfo(BaseModel):
-    name: str
-    email: str
-    experience: str
+    name: str = Field(..., min_length=1, description="Имя пользователя")
+    email: str = Field(..., min_length=1, description="Email пользователя")
+    experience: str = Field(..., min_length=1, description="Опыт пользователя")
 
 class SubmitRequest(BaseModel):
     user: UserInfo
