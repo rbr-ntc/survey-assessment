@@ -1,4 +1,5 @@
 # Multi-stage build для оптимизации размера образа
+# Основано на официальной документации Next.js
 
 # Stage 1: Build dependencies
 FROM node:18-alpine AS deps
@@ -8,7 +9,7 @@ WORKDIR /app
 # Копируем package files
 COPY package*.json ./
 
-# Устанавливаем зависимости (нужны dev dependencies для сборки)
+# Устанавливаем ВСЕ зависимости (включая dev для сборки)
 RUN npm ci
 
 # Stage 2: Build application
@@ -38,6 +39,9 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
+# Устанавливаем curl для health check
+RUN apk add --no-cache curl
+
 # Создаем пользователя для безопасности
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -58,7 +62,7 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Health check (используем curl вместо wget)
+# Health check с curl
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3000/ || exit 1
 
