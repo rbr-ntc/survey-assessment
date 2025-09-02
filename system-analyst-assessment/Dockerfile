@@ -2,6 +2,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Принимаем build args для переменных окружения
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_API_KEY
+
+# Устанавливаем переменные окружения во время сборки
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_KEY=$NEXT_PUBLIC_API_KEY
+
 COPY package.json package-lock.json ./
 RUN npm ci
 

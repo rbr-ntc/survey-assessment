@@ -37,6 +37,9 @@ jobs:
           context: ./system-analyst-assessment
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:${{ github.sha }},${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.FRONTEND_API_URL }}
+            NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -99,7 +102,8 @@ jobs:
                 image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
                 restart: always
                 environment:
-                  - NEXT_PUBLIC_API_URL=http://${{ secrets.SERVER_HOST }}:8000
+                  - NEXT_PUBLIC_API_URL=${{ secrets.FRONTEND_API_URL }}
+                  - NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
                 ports:
                   - "3000:3000"
                 depends_on:
