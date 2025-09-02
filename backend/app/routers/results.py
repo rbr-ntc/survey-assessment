@@ -89,7 +89,7 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
     try:
         client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         response = await client.chat.completions.create(
-            model="gpt-5o",
+            model="gpt-5",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
