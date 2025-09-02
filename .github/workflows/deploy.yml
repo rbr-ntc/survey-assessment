@@ -50,8 +50,8 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:${{ github.sha }},${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
           build-args: |
-            NEXT_PUBLIC_API_URL=${{ secrets.FRONTEND_API_URL }}
-            NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
+            NEXT_PUBLIC_API_URL=${{ env.FRONTEND_API_URL }}
+            NEXT_PUBLIC_API_KEY=${{ env.API_KEY }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
