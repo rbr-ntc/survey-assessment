@@ -12,21 +12,18 @@ services:
   backend:
     build: ./backend
     restart: always
-    environment:
-      - MONGO_URL=mongodb://mongo:27017/assessment
-      - CORS_ORIGINS=http://localhost:3000,http://147.45.166.90:3000
+    env_file:
+      - .env
     ports:
       - 8000:8000
     depends_on:
       - mongo
-    env_file:
-      - ./backend/.env
 
   frontend:
     build: ./system-analyst-assessment
     restart: always
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    env_file:
+      - .env
     ports:
       - 3000:3000
     depends_on:
