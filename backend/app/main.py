@@ -24,9 +24,10 @@ app = FastAPI(
 )
 
 # Добавляем middleware
-app.add_middleware(LoggingMiddleware)
+app.add_middleware(LoggingMiddleware, app)
 app.add_middleware(
     RateLimitMiddleware,
+    app,
     requests_per_minute=settings.RATE_LIMIT_PER_MINUTE,
     requests_per_hour=settings.RATE_LIMIT_PER_HOUR
 )
