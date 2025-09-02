@@ -39,7 +39,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:${{ github.sha }},${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
           build-args: |
-            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+            CORS_ORIGINS=${{ env.CORS_ORIGINS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -50,8 +50,8 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:${{ github.sha }},${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
           build-args: |
-            NEXT_PUBLIC_API_URL=${{ env.FRONTEND_API_URL }}
-            NEXT_PUBLIC_API_KEY=${{ env.API_KEY }}
+            NEXT_PUBLIC_API_URL=${{ secrets.FRONTEND_API_URL }}
+            NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -106,8 +106,8 @@ jobs:
                 restart: always
                 environment:
                   - MONGO_URL=mongodb://mongo:27017/assessment
-                  - CORS_ORIGINS=${{ env.CORS_ORIGINS }}
-                  - API_KEY=${{ env.API_KEY }}
+                  - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+                  - API_KEY=${{ secrets.API_KEY }}
                   - OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
                 ports:
                   - "8000:8000"
@@ -160,7 +160,16 @@ jobs:
             # Проверяем статус
             docker compose -f docker-compose.prod.yml ps
 
-            # Проверяем подключение к MongoDB
+            # Проверяем подключение к MongoDB и принудительно импортируем вопросы
+            echo "Checking MongoDB connection and importing questions..."
             docker exec survey-assessment-mongo-1 mongosh --eval "db.runCommand('ping')" assessment
+
+            # Принудительно импортируем вопросы (на случай если init.js не сработал)
+            echo "Forcing questions import..."
+            docker exec survey-assessment-mongo-1 mongoimport --db assessment --collection questions --drop --file /docker-entrypoint-initdb.d/improved-test-questions.json --jsonArray
+
+            # Проверяем количество вопросов
+            echo "Checking questions count..."
+            docker exec survey-assessment-mongo-1 mongosh --eval "db.questions.countDocuments()" assessment
 
             echo "Deployment completed successfully!"
