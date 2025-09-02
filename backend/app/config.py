@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     MONGO_URL: str = "mongodb://mongo:27017/assessment"
     
     # CORS
-    CORS_ORIGINS: str = "http://localhost:3000"
+    CORS_ORIGINS: str = os.environ.get("CORS_ORIGINS", "http://localhost:3000")
     
     # Rate Limiting
     RATE_LIMIT_PER_MINUTE: int = 60
