@@ -1,11 +1,11 @@
 import logging
 import os
+import time
 
 from app.config import settings
-from app.middleware import LoggingMiddleware, RateLimitMiddleware
 from app.routers import questions, recommendations, results
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
@@ -23,14 +23,27 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Добавляем middleware
-app.add_middleware(LoggingMiddleware, app)
-app.add_middleware(
-    RateLimitMiddleware,
-    app,
-    requests_per_minute=settings.RATE_LIMIT_PER_MINUTE,
-    requests_per_hour=settings.RATE_LIMIT_PER_HOUR
-)
+# Добавляем middleware используя декораторы
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+
+@app.middleware("http")
+async def add_logging_middleware(request: Request, call_next):
+    # Логируем начало запроса
+    logger.info(f"Request started: {request.method} {request.url.path}")
+    
+    # Выполняем запрос
+    response = await call_next(request)
+    
+    # Логируем результат
+    logger.info(f"Request completed: {request.method} {request.url.path} -> {response.status_code}")
+    
+    return response
 
 app.add_middleware(
     CORSMiddleware,
