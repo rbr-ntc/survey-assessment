@@ -2,6 +2,12 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Принимаем build args для переменных окружения
+ARG CORS_ORIGINS
+
+# Устанавливаем переменные окружения во время сборки
+ENV CORS_ORIGINS=$CORS_ORIGINS
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 

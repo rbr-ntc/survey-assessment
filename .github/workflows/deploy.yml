@@ -28,6 +28,8 @@ jobs:
           context: ./backend
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:${{ github.sha }},${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
+          build-args: |
+            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -70,6 +72,7 @@ jobs:
             MONGO_URL=mongodb://mongo:27017/assessment
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             API_KEY=${{ secrets.API_KEY }}
+            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
             EOF
 
             # Создаем docker-compose.prod.yml для production
@@ -91,6 +94,7 @@ jobs:
                 restart: always
                 environment:
                   - MONGO_URL=mongodb://mongo:27017/assessment
+                  - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
                 ports:
                   - "8000:8000"
                 depends_on:
