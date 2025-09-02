@@ -139,3 +139,11 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+
+# SSH Keys and sensitive files
+*.pem
+*.key
+*.ppk
+survey_deploy
+survey_deploy.pub
+SSH_KEYS_SETUP.md
