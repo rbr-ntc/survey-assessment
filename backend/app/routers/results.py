@@ -37,7 +37,7 @@ def get_level(score):
             return lvl
     return LEVELS[-1]
 
-async def generate_and_save_recommendations(result_id, user, level, overallScore, strengths, weaknesses):
+async def generate_and_save_recommendations(result_id, user, level, overallScore, strengths, weaknesses, question_details):
     strong_str = ', '.join(f'{s["name"]} ({s["score"]}%)' for s in strengths) or 'Требуют развития'
     weak_str = ', '.join(f'{w["name"]} ({w["score"]}%)' for w in weaknesses) or 'Нет явных'
     system_prompt = """
@@ -89,12 +89,12 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
     try:
         client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         response = await client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-5o",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1500,
+            max_tokens=2000,
             temperature=1.15
         )
         recommendations = response.choices[0].message.content
@@ -109,9 +109,10 @@ async def submit_results(submit: SubmitRequest, background_tasks: BackgroundTask
     answers = submit.answers
     user = submit.user.dict() if hasattr(submit.user, 'dict') else dict(submit.user)
 
-    # Подсчёт баллов по категориям
+    # Подсчёт баллов по категориям и сбор деталей по вопросам
     category_scores = {cat: 0 for cat in CATEGORIES}
     category_max_scores = {cat: 0 for cat in CATEGORIES}
+    question_details = []
 
     for q in questions:
         qid = q['id']
@@ -119,9 +120,30 @@ async def submit_results(submit: SubmitRequest, background_tasks: BackgroundTask
         max_score = max(q.get('weights', {}).values()) if 'weights' in q else 5
         category_max_scores[cat] += max_score
         answer = answers.get(qid)
+        
         if answer:
             score = q.get('weights', {}).get(answer, 0) if 'weights' in q else 0
             category_scores[cat] += score
+            
+            # Собираем детали по каждому вопросу
+            user_answer_text = next((opt['text'] for opt in q['options'] if opt['value'] == answer), "")
+            correct_answer_value = max(q.get('weights', {}).items(), key=lambda x: x[1])[0] if q.get('weights') else ""
+            correct_answer_text = next((opt['text'] for opt in q['options'] if opt['value'] == correct_answer_value), "")
+            
+            question_detail = {
+                "question_id": qid,
+                "question_text": q['question'],
+                "user_answer_value": answer,
+                "user_answer_text": user_answer_text,
+                "correct_answer_value": correct_answer_value,
+                "correct_answer_text": correct_answer_text,
+                "user_score": score,
+                "max_score": max_score,
+                "explanation": f"Пользователь выбрал '{user_answer_text}' (балл: {score}/{max_score})",
+                "difficulty": "medium",  # Можно добавить логику определения сложности
+                "learning_tip": f"Для улучшения в категории '{CATEGORIES[cat]['name']}' изучите: {q['question']}"
+            }
+            question_details.append(question_detail)
 
     # Проценты по категориям + веса
     categories = {}
@@ -163,6 +185,7 @@ async def submit_results(submit: SubmitRequest, background_tasks: BackgroundTask
         "strengths": strengths,
         "weaknesses": weaknesses,
         "recommendations": None,
+        "question_details": question_details,
         "created_at": datetime.utcnow()
     }
     insert_result = await db.results.insert_one(result_doc)
@@ -176,7 +199,8 @@ async def submit_results(submit: SubmitRequest, background_tasks: BackgroundTask
         level,
         overallScore,
         strengths,
-        weaknesses
+        weaknesses,
+        question_details
     )
 
     return {
@@ -186,7 +210,8 @@ async def submit_results(submit: SubmitRequest, background_tasks: BackgroundTask
         "categories": categories,
         "strengths": strengths,
         "weaknesses": weaknesses,
-        "recommendations": None
+        "recommendations": None,
+        "question_details": question_details
     }
 
 @router.get("/results/{result_id}", dependencies=[Depends(verify_api_key)])
@@ -208,5 +233,6 @@ async def get_result_by_id(result_id: str):
         "strengths": result.get("strengths", []),
         "weaknesses": result.get("weaknesses", []),
         "recommendations": result.get("recommendations", None),
+        "question_details": result.get("question_details", []),
         "created_at": result.get("created_at")
     }

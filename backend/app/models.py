@@ -23,6 +23,19 @@ class SubmitRequest(BaseModel):
     user: UserInfo
     answers: Dict[str, str]  # {question_id: selected_value}
 
+class QuestionDetail(BaseModel):
+    question_id: str
+    question_text: str
+    user_answer_value: str
+    user_answer_text: str
+    correct_answer_value: str
+    correct_answer_text: str
+    user_score: int
+    max_score: int
+    explanation: str
+    difficulty: str
+    learning_tip: str
+
 class Result(BaseModel):
     overallScore: int
     level: dict
@@ -30,6 +43,7 @@ class Result(BaseModel):
     strengths: list
     weaknesses: list
     recommendations: Optional[str] = None
+    question_details: Optional[List[QuestionDetail]] = None
 
 class RecommendationRequest(BaseModel):
     user: UserInfo
