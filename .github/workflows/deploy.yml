@@ -117,9 +117,6 @@ jobs:
               frontend:
                 image: ${{ env.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
                 restart: always
-                environment:
-                  - NEXT_PUBLIC_API_URL=${{ env.FRONTEND_API_URL }}
-                  - NEXT_PUBLIC_API_KEY=${{ env.API_KEY }}
                 ports:
                   - "3000:3000"
                 depends_on:
