@@ -74,13 +74,15 @@ async def get_recommendations(req: RecommendationRequest):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1500,
+            max_tokens=2000,
             temperature=1.15
         )
         content = response.choices[0].message.content
     except OpenAIError as e:
+        print(f"OpenAI error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"OpenAI error: {str(e)}")
     except Exception as e:
+        print(f"General error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
     return Response(content, media_type="text/markdown")

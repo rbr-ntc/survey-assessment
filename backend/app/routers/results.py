@@ -90,7 +90,7 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
     try:
         client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         response = await client.chat.completions.create(
-            model="gpt-5",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
@@ -100,7 +100,8 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
         )
         recommendations = response.choices[0].message.content
     except Exception as e:
-        recommendations = "Не удалось сгенерировать рекомендации. Попробуйте позже."
+        print(f"Error generating recommendations: {str(e)}")
+        recommendations = f"Не удалось сгенерировать рекомендации: {str(e)}. Попробуйте позже."
     await db.results.update_one({"_id": ObjectId(result_id)}, {"$set": {"recommendations": recommendations}})
 
 @router.post("/results", response_model=ResultWithId, dependencies=[Depends(verify_api_key)])
