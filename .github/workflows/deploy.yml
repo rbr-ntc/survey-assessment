@@ -86,7 +86,7 @@ jobs:
 
             # Создаем .env файл для production
             cat > .env << EOF
-            MONGO_URL=mongodb://mongo:27017/assessment
+            MONGO_URL=mongodb://survey-assessment-mongo:27017/assessment
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             API_KEY=${{ secrets.API_KEY }}
             CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
@@ -129,6 +129,7 @@ jobs:
                 depends_on:
                   - frontend
                   - backend
+                  - survey-assessment-mongo
                 restart: unless-stopped
                 networks:
                   - survey-network
@@ -151,6 +152,7 @@ jobs:
                 image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
                 container_name: survey-assessment-backend
                 environment:
+                  - MONGO_URL=mongodb://survey-assessment-mongo:27017/assessment
                   - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
                   - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
                   - API_KEY=${{ secrets.API_KEY }}
@@ -161,7 +163,7 @@ jobs:
                 networks:
                   - survey-network
 
-              mongo:
+              survey-assessment-mongo:
                 image: mongo:6
                 container_name: survey-assessment-mongo
                 environment:
