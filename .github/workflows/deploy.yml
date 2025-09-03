@@ -40,6 +40,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:${{ github.sha }},${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
           build-args: |
             CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+            ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -52,6 +53,7 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.FRONTEND_API_URL }}
             NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
+            NEXT_PUBLIC_ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -113,6 +115,7 @@ jobs:
                   - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
                   - API_KEY=${{ secrets.API_KEY }}
                   - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+                  - ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
                 ports:
                   - "8000:8000"
                 depends_on:

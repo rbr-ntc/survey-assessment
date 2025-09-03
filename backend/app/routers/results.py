@@ -6,23 +6,12 @@ from typing import Dict, List
 from app.db import db
 from app.deps import verify_api_key
 from app.models import QuickTestRequest, Result, ResultWithId, SubmitRequest
+from app.utils import CATEGORIES, get_level
 from bson import ObjectId
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from openai import AsyncOpenAI, OpenAIError
 
 router = APIRouter()
-
-CATEGORIES = {
-    'documentation': {'weight': 1, 'name': 'Документирование'},
-    'modeling': {'weight': 1.2, 'name': 'Моделирование процессов'},
-    'api': {'weight': 1.1, 'name': 'API Design'},
-    'database': {'weight': 1.1, 'name': 'Базы данных'},
-    'messaging': {'weight': 1, 'name': 'Асинхронные взаимодействия'},
-    'system_design': {'weight': 1.3, 'name': 'Проектирование систем'},
-    'security': {'weight': 1, 'name': 'Безопасность'},
-    'analytical': {'weight': 1.2, 'name': 'Аналитическое мышление'},
-    'communication': {'weight': 1, 'name': 'Коммуникации'},
-}
 
 LEVELS = [
     {"level": "Senior", "description": "Экспертный уровень системного аналитика", "nextLevel": "Lead/Architect", "minYears": "5+", "nextLevelScore": 100, "minScore": 85},
@@ -276,6 +265,12 @@ async def quick_test(
     test_data: QuickTestRequest,
     background_tasks: BackgroundTasks
 ):
+    # Проверяем, включены ли quick-test
+    if not os.environ.get("ENABLE_QUICK_TEST", "false").lower() in ("true", "1", "yes"):
+        raise HTTPException(
+            status_code=404, 
+            detail="Quick test functionality is disabled"
+        )
     test_type = test_data.test_type
     """
     Быстрый тест с предзаполненными ответами
@@ -432,6 +427,12 @@ def generate_quick_test_answers(questions: List[Dict], test_type: str) -> Dict[s
 
 @router.get("/quick-test/{test_id}")
 async def get_quick_test_result(test_id: str):
+    # Проверяем, включены ли quick-test
+    if not os.environ.get("ENABLE_QUICK_TEST", "false").lower() in ("true", "1", "yes"):
+        raise HTTPException(
+            status_code=404, 
+            detail="Quick test functionality is disabled"
+        )
     """Получить результат быстрого теста"""
     try:
         obj_id = ObjectId(test_id)

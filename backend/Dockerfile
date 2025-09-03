@@ -5,7 +5,9 @@ WORKDIR /app
 
 # Принимаем build args для переменных окружения
 ARG CORS_ORIGINS
+ARG ENABLE_QUICK_TEST
 ENV CORS_ORIGINS=$CORS_ORIGINS
+ENV ENABLE_QUICK_TEST=$ENABLE_QUICK_TEST
 
 # Устанавливаем системные зависимости
 RUN apt-get update && apt-get install -y \
