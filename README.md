@@ -33,3 +33,4 @@ uvicorn app.main:app --reload
 ```
 
 ---
+# Full redeploy triggered at Wed Sep  3 15:47:18 MSK 2025
