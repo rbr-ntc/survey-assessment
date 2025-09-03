@@ -92,6 +92,26 @@ jobs:
             CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
             EOF
 
+            # Создаем директорию для SSL сертификатов
+            mkdir -p ssl
+
+            # Создаем SSL сертификат из GitHub Secrets
+            if [ ! -z "${{ secrets.SSL_CERTIFICATE }}" ]; then
+                echo "🔐 Создаем SSL сертификат из GitHub Secrets..."
+                echo "${{ secrets.SSL_CERTIFICATE }}" > ssl/fullchain.crt
+                echo "${{ secrets.SSL_PRIVATE_KEY }}" > ssl/privkey.key
+                
+                # Устанавливаем правильные права доступа
+                chmod 600 ssl/privkey.key
+                chmod 644 ssl/fullchain.crt
+                chown root:root ssl/privkey.key ssl/fullchain.crt
+                
+                echo "✅ SSL сертификаты созданы с правильными правами"
+            else
+                echo "⚠️ SSL сертификаты не найдены в GitHub Secrets"
+                echo "💡 Добавьте SSL_CERTIFICATE и SSL_PRIVATE_KEY в GitHub Secrets"
+            fi
+
             # Создаем docker-compose.prod.yml для production с Nginx
             cat > docker-compose.prod.yml << EOF
             version: '3.8'
