@@ -28,4 +28,5 @@ RUN npm run build
 # Запускаем
 EXPOSE 3000
 
-CMD ["npm", "start"] 
+# Для output: standalone используем node напрямую
+CMD ["node", ".next/standalone/server.js"] 
