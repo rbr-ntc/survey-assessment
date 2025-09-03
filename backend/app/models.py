@@ -55,5 +55,8 @@ class RecommendationRequest(BaseModel):
 class RecommendationResponse(BaseModel):
     recommendations: str
 
+class QuickTestRequest(BaseModel):
+    test_type: str = Field(..., description="Тип теста: expert, intermediate, beginner, random")
+
 class ResultWithId(Result):
     result_id: str

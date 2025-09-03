@@ -5,7 +5,7 @@ from typing import Dict, List
 
 from app.db import db
 from app.deps import verify_api_key
-from app.models import Result, ResultWithId, SubmitRequest
+from app.models import QuickTestRequest, Result, ResultWithId, SubmitRequest
 from bson import ObjectId
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from openai import AsyncOpenAI, OpenAIError
@@ -240,9 +240,10 @@ async def get_result_by_id(result_id: str):
 
 @router.post("/quick-test")
 async def quick_test(
-    test_type: str,
+    test_data: QuickTestRequest,
     background_tasks: BackgroundTasks
 ):
+    test_type = test_data.test_type
     """
     Быстрый тест с предзаполненными ответами
     test_type: "expert", "intermediate", "beginner", "random"
