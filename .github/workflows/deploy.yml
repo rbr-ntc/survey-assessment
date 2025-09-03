@@ -91,46 +91,75 @@ jobs:
             CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
             EOF
 
-            # Создаем docker-compose.prod.yml для production
+            # Создаем docker-compose.prod.yml для production с Nginx
             cat > docker-compose.prod.yml << EOF
             version: '3.8'
 
             services:
-              mongo:
-                image: mongo:6
-                restart: always
+              nginx:
+                image: nginx:alpine
+                container_name: survey-assessment-nginx
                 ports:
-                  - "27017:27017"
+                  - "80:80"
+                  - "443:443"
                 volumes:
-                  - mongo_data:/data/db
-                  - ./mongo-init:/docker-entrypoint-initdb.d
-                environment:
-                  - MONGO_INITDB_DATABASE=assessment
-
-              backend:
-                image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
-                restart: always
-                environment:
-                  - MONGO_URL=mongodb://mongo:27017/assessment
-                  - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
-                  - API_KEY=${{ secrets.API_KEY }}
-                  - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-                  - ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
-                ports:
-                  - "8000:8000"
+                  - ./nginx.conf:/etc/nginx/conf.d/default.conf
+                  - ./ssl:/etc/nginx/ssl
                 depends_on:
-                  - mongo
+                  - frontend
+                  - backend
+                restart: unless-stopped
+                networks:
+                  - survey-network
 
               frontend:
                 image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
-                restart: always
-                ports:
-                  - "3000:3000"
-                depends_on:
-                  - backend
+                container_name: survey-assessment-frontend
+                environment:
+                  - NODE_ENV=production
+                  - NEXT_PUBLIC_API_URL=https://147.45.166.90/api
+                  - NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
+                  - NEXT_PUBLIC_ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
+                expose:
+                  - "3000"
+                restart: unless-stopped
+                networks:
+                  - survey-network
+
+              backend:
+                image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
+                container_name: survey-assessment-backend
+                environment:
+                  - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+                  - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+                  - API_KEY=${{ secrets.API_KEY }}
+                  - ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
+                expose:
+                  - "8000"
+                restart: unless-stopped
+                networks:
+                  - survey-network
+
+              mongo:
+                image: mongo:6
+                container_name: survey-assessment-mongo
+                environment:
+                  - MONGO_INITDB_DATABASE=assessment
+                volumes:
+                  - mongo_data:/data/db
+                  - ./mongo-init:/docker-entrypoint-initdb.d
+                expose:
+                  - "27017"
+                restart: unless-stopped
+                networks:
+                  - survey-network
 
             volumes:
               mongo_data:
+
+            networks:
+              survey-network:
+                driver: bridge
             EOF
 
             # Создаем директорию для инициализации MongoDB
@@ -138,6 +167,44 @@ jobs:
 
             # Копируем вопросы в директорию инициализации
             cp backend/improved-test-questions.json mongo-init/
+
+            # Настраиваем HTTPS с Nginx
+            echo "🔒 Настраиваем HTTPS..."
+
+            # Устанавливаем Nginx и Certbot
+            apt update -y
+            apt install -y nginx certbot python3-certbot-nginx
+
+            # Останавливаем Nginx для настройки
+            systemctl stop nginx
+
+            # Копируем конфигурацию Nginx
+            cp nginx.conf /etc/nginx/sites-available/survey-assessment
+            ln -sf /etc/nginx/sites-available/survey-assessment /etc/nginx/sites-enabled/
+            rm -f /etc/nginx/sites-enabled/default
+
+            # Проверяем конфигурацию
+            nginx -t
+
+            # Запускаем Nginx
+            systemctl start nginx
+            systemctl enable nginx
+
+            # Открываем порты в firewall
+            ufw allow 80
+            ufw allow 443
+            ufw allow 22
+            ufw --force enable
+
+            # Генерируем SSL сертификат
+            echo "🔐 Генерируем SSL сертификат..."
+            certbot --nginx -d 147.45.166.90 --non-interactive --agree-tos --email admin@example.com
+
+            # Настраиваем автообновление сертификата
+            (crontab -l 2>/dev/null; echo "0 12 * * * /usr/bin/certbot renew --quiet") | crontab -
+
+            # Перезапускаем Nginx
+            systemctl reload nginx
 
             # Создаем скрипт инициализации MongoDB
             cat > mongo-init/init.js << EOF
