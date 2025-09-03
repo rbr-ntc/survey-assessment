@@ -1,6 +1,8 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import categories from '../lib/categories'
+import AILoader from './AILoader'
 import { useAssessment } from './AssessmentContext'
 import IntroForm from './IntroForm'
 import QuestionScreen from './QuestionScreen'
@@ -8,6 +10,7 @@ import ResultsScreen from './ResultsScreen'
 
 const SystemAnalystAssessment = () => {
 	const router = useRouter()
+	const [isProcessingResults, setIsProcessingResults] = useState(false)
 	const {
 		currentQuestionIndex,
 		answers,
@@ -30,9 +33,16 @@ const SystemAnalystAssessment = () => {
 	} = useAssessment()
 
 	const handleFinish = async () => {
-		const data = await submitResults()
-		if (data && data.result_id) {
-			router.push(`/result/${data.result_id}`)
+		setIsProcessingResults(true)
+		try {
+			const data = await submitResults()
+			if (data && data.result_id) {
+				router.push(`/result/${data.result_id}`)
+			}
+		} catch (error) {
+			console.error('Error submitting results:', error)
+		} finally {
+			setIsProcessingResults(false)
 		}
 	}
 
@@ -130,6 +140,15 @@ ${
 	const question = questions[currentQuestionIndex]
 	const progress = ((currentQuestionIndex + 1) / questions.length) * 100
 	const category = categories[question.category]
+
+	// Показываем AI-лоадер во время обработки результатов
+	if (isProcessingResults) {
+		return (
+			<div className='min-h-screen bg-gray-100 flex items-center justify-center'>
+				<AILoader message='Обрабатываем ваши ответы и рассчитываем результаты...' />
+			</div>
+		)
+	}
 
 	return (
 		<QuestionScreen

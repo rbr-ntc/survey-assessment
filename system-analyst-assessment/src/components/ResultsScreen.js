@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import remarkGfm from 'remark-gfm'
+import AILoader from './AILoader'
 
 const ResultsScreen = ({
 	menteeInfo,
@@ -45,13 +46,13 @@ const ResultsScreen = ({
 
 	return (
 		<div className='min-h-screen bg-gray-100 py-8'>
-			      <Confetti
-        ref={confettiRef}
-        className="absolute left-0 top-0 z-0 size-full"
-        onMouseEnter={() => {
-          confettiRef.current?.fire({});
-        }}
-      />
+			<Confetti
+				ref={confettiRef}
+				className='absolute left-0 top-0 z-0 size-full'
+				onMouseEnter={() => {
+					confettiRef.current?.fire({})
+				}}
+			/>
 			<div className='max-w-4xl mx-auto'>
 				<div className='bg-white rounded-2xl p-8 shadow-xl'>
 					{/* Заголовок с уровнем */}
@@ -210,8 +211,8 @@ const ResultsScreen = ({
 						</div>
 					)}
 					{isGeneratingRecommendations && (
-						<div className='mb-8 text-center text-blue-500 font-semibold'>
-							Генерируем рекомендации...
+						<div className='mb-8'>
+							<AILoader message='ИИ анализирует ваши ответы и создает персональные рекомендации...' />
 						</div>
 					)}
 
