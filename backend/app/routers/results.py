@@ -258,10 +258,84 @@ async def quick_test(
     # Генерируем ответы в зависимости от типа теста
     answers = generate_quick_test_answers(questions, test_type)
     
-    # Создаем результат теста
+    # Рассчитываем результаты теста
+    category_scores = {cat: 0 for cat in CATEGORIES}
+    category_max_scores = {cat: 0 for cat in CATEGORIES}
+    question_details = []
+
+    for q in questions:
+        qid = q['id']
+        cat = q['category']
+        max_score = max(q.get('weights', {}).values()) if 'weights' in q else 5
+        category_max_scores[cat] += max_score
+        answer = answers.get(qid)
+        
+        if answer:
+            score = q.get('weights', {}).get(answer, 0) if 'weights' in q else 0
+            category_scores[cat] += score
+            
+            # Собираем детали по каждому вопросу
+            user_answer_text = next((opt['text'] for opt in q['options'] if opt['value'] == answer), "")
+            correct_answer_value = max(q.get('weights', {}).items(), key=lambda x: x[1])[0] if q.get('weights') else ""
+            correct_answer_text = next((opt['text'] for opt in q['options'] if opt['value'] == correct_answer_value), "")
+            
+            question_detail = {
+                "question_id": qid,
+                "question_text": q['question'],
+                "user_answer_value": answer,
+                "user_answer_text": user_answer_text,
+                "correct_answer_value": correct_answer_value,
+                "correct_answer_text": correct_answer_text,
+                "user_score": score,
+                "max_score": max_score,
+                "explanation": f"Пользователь выбрал '{user_answer_text}' (балл: {score}/{max_score})",
+                "difficulty": "medium",
+                "learning_tip": f"Для улучшения в категории '{CATEGORIES[cat]['name']}' изучите: {q['question']}"
+            }
+            question_details.append(question_detail)
+
+    # Проценты по категориям + веса
+    categories = {}
+    for cat in CATEGORIES:
+        percent = round((category_scores[cat] / category_max_scores[cat]) * 100) if category_max_scores[cat] > 0 else 0
+        categories[cat] = {
+            "score": percent,
+            "weight": CATEGORIES[cat]["weight"],
+            "name": CATEGORIES[cat]["name"]
+        }
+
+    # Взвешенный общий балл
+    weighted_sum = sum(categories[cat]["score"] * CATEGORIES[cat]['weight'] for cat in CATEGORIES)
+    total_weight = sum(CATEGORIES[cat]['weight'] for cat in CATEGORIES)
+    overallScore = round(weighted_sum / total_weight)
+
+    level = get_level(overallScore)
+    level = dict(level)  # копия, чтобы не менять глобальный LEVELS
+    level["nextLevelScore"] = str(level["nextLevelScore"])
+    level["minScore"] = str(level["minScore"])
+
+    # Сильные стороны (score >= 70)
+    strengths = [
+        {"name": categories[cat]["name"], "score": categories[cat]["score"]}
+        for cat in categories if categories[cat]["score"] >= 70
+    ]
+    # Зоны развития (score < 60)
+    weaknesses = [
+        {"name": categories[cat]["name"], "score": categories[cat]["score"]}
+        for cat in categories if categories[cat]["score"] < 60
+    ]
+
+    # Создаем полный результат теста
     test_result = {
         "user": {"name": f"Quick Test - {test_type.title()}", "experience": "N/A"},
         "answers": answers,
+        "categories": categories,
+        "overallScore": overallScore,
+        "level": level,
+        "strengths": strengths,
+        "weaknesses": weaknesses,
+        "recommendations": None,
+        "question_details": question_details,
         "created_at": datetime.utcnow()
     }
     
@@ -274,11 +348,11 @@ async def quick_test(
         generate_and_save_recommendations,
         result_id,
         test_result["user"],
-        {"level": "Quick Test", "description": "Quick test result"},
-        0,  # overallScore будет вычислен
-        [],  # strengths будет вычислен
-        [],  # weaknesses будет вычислен
-        []   # question_details будет вычислен
+        level,
+        overallScore,
+        strengths,
+        weaknesses,
+        question_details
     )
     
     return {
