@@ -39,7 +39,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:${{ github.sha }},${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
           build-args: |
-            CORS_ORIGINS=${{ env.CORS_ORIGINS }}
+            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
