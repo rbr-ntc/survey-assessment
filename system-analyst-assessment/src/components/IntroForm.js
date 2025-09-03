@@ -1,6 +1,14 @@
 import { useState } from 'react'
 import { useAssessment } from './AssessmentContext'
 
+const experienceOptions = [
+	'Меньше года',
+	'1-2 года',
+	'2-3 года',
+	'3-5 лет',
+	'5+ лет',
+]
+
 const IntroForm = ({ questionsCount = 0 }) => {
 	const {
 		handleStartAssessment,
@@ -63,139 +71,128 @@ const IntroForm = ({ questionsCount = 0 }) => {
 	}
 
 	return (
-		<div className='max-w-md mx-auto bg-white rounded-lg shadow-lg p-8'>
-			<h2 className='text-2xl font-bold text-center mb-6 text-gray-800'>
-				Системный аналитик - Оценка компетенций
-			</h2>
+		<div className='flex items-center justify-center min-h-screen'>
+			<div className='w-full max-w-md bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6'>
+				<div className='flex flex-col items-center gap-2'>
+					<div className='text-4xl mb-2'>🎯</div>
+					<h1 className='text-2xl font-bold text-gray-800 text-center'>
+						Комплексная оценка
+						<br />
+						системного аналитика
+					</h1>
+					<p className='text-gray-400 text-center text-base'>
+						{isQuestionsLoading
+							? 'Загрузка вопросов...'
+							: questions.length > 0
+							? `${questions.length} вопрос${
+									questions.length === 1
+										? ''
+										: questions.length < 5
+										? 'а'
+										: 'ов'
+							  } • 15-20 минут • AI-рекомендации`
+							: '0 вопросов • 15-20 минут • AI-рекомендации'}
+					</p>
+				</div>
 
-			{/* Информация о тесте */}
-			<div className='text-center mb-6 text-gray-600'>
-				{isQuestionsLoading ? (
-					<span className='text-sm'>Загрузка вопросов...</span>
-				) : questions.length > 0 ? (
-					<span className='text-sm'>
-						{questions.length} вопросов • 15-20 минут • AI-рекомендации
-					</span>
-				) : (
-					<span className='text-sm'>
-						0 вопросов • 15-20 минут • AI-рекомендации
-					</span>
-				)}
-			</div>
-
-			<form onSubmit={handleSubmit} className='space-y-4'>
-				<div>
-					<label
-						htmlFor='name'
-						className='block text-sm font-medium text-gray-700 mb-1'
-					>
-						Имя
-					</label>
+				<form className='flex flex-col gap-4' onSubmit={handleSubmit}>
 					<input
+						className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition placeholder-gray-400 bg-white text-gray-900'
 						type='text'
-						id='name'
 						name='name'
+						placeholder='Ваше имя'
 						value={formData.name}
 						onChange={handleInputChange}
-						className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-						placeholder='Введите ваше имя'
 						required
 					/>
-				</div>
-
-				<div>
-					<label
-						htmlFor='email'
-						className='block text-sm font-medium text-gray-700 mb-1'
-					>
-						Email
-					</label>
 					<input
+						className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition placeholder-gray-400 bg-white text-gray-900'
 						type='email'
-						id='email'
 						name='email'
+						placeholder='Email'
 						value={formData.email}
 						onChange={handleInputChange}
-						className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-						placeholder='Введите ваш email'
 						required
 					/>
-				</div>
-
-				<div>
-					<label
-						htmlFor='experience'
-						className='block text-sm font-medium text-gray-700 mb-1'
-					>
-						Опыт работы
-					</label>
 					<select
-						id='experience'
+						className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition bg-white text-gray-900'
 						name='experience'
 						value={formData.experience}
 						onChange={handleInputChange}
-						className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
 						required
 					>
-						<option value=''>Выберите опыт</option>
-						<option value='Нет опыта'>Нет опыта</option>
-						<option value='До 1 года'>До 1 года</option>
-						<option value='1-3 года'>1-3 года</option>
-						<option value='3-5 лет'>3-5 лет</option>
-						<option value='Более 5 лет'>Более 5 лет</option>
+						<option value=''>Опыт в системном анализе</option>
+						{experienceOptions.map(opt => (
+							<option key={opt} value={opt}>
+								{opt}
+							</option>
+						))}
 					</select>
-				</div>
+					<button
+						type='submit'
+						className='w-full py-3 rounded-lg bg-blue-400 text-white font-semibold text-lg shadow-sm hover:bg-blue-500 transition disabled:bg-gray-300 disabled:cursor-not-allowed'
+						disabled={isLoading || isQuestionsLoading}
+					>
+						{isLoading
+							? 'Запуск...'
+							: isQuestionsLoading
+							? 'Загрузка вопросов...'
+							: 'Начать тестирование'}
+					</button>
+				</form>
 
-				<button
-					type='submit'
-					disabled={isLoading}
-					className='w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'
-				>
-					{isLoading ? 'Запуск...' : 'Начать тестирование'}
-				</button>
-			</form>
-
-			{/* Quick Test кнопки - отображаются только когда включены */}
-			{isQuickTestEnabled && (
-				<div className='mt-6 pt-6 border-t border-gray-200'>
-					<h3 className='text-lg font-semibold text-center mb-4 text-gray-700'>
-						Быстрое тестирование (только для разработки)
-					</h3>
-					<div className='grid grid-cols-2 gap-3'>
-						<button
-							onClick={() => handleQuickTest('expert')}
-							disabled={isQuickTestLoading}
-							className='bg-green-600 text-white py-2 px-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm'
-						>
-							{isQuickTestLoading ? 'Загрузка...' : 'Эксперт'}
-						</button>
-						<button
-							onClick={() => handleQuickTest('intermediate')}
-							disabled={isQuickTestLoading}
-							className='bg-yellow-600 text-white py-2 px-3 rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm'
-						>
-							{isQuickTestLoading ? 'Загрузка...' : 'Средний'}
-						</button>
-						<button
-							onClick={() => handleQuickTest('beginner')}
-							disabled={isQuickTestLoading}
-							className='bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm'
-						>
-							{isQuickTestLoading ? 'Загрузка...' : 'Начинающий'}
-						</button>
-						<button
-							onClick={() => handleQuickTest('random')}
-							disabled={isQuickTestLoading}
-							className='bg-purple-600 text-white py-2 px-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm'
-						>
-							{isQuickTestLoading ? 'Загрузка...' : 'Случайно'}
-						</button>
+				{/* Quick Test кнопки - отображаются только когда включены */}
+				{isQuickTestEnabled && (
+					<div className='border-t border-gray-200 pt-4'>
+						<h3 className='text-lg font-semibold text-center mb-4 text-gray-700'>
+							Быстрое тестирование (только для разработки)
+						</h3>
+						<div className='grid grid-cols-2 gap-3'>
+							<button
+								onClick={() => handleQuickTest('expert')}
+								disabled={isQuickTestLoading}
+								className='bg-green-600 text-white py-2 px-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm'
+							>
+								{isQuickTestLoading ? 'Загрузка...' : 'Эксперт'}
+							</button>
+							<button
+								onClick={() => handleQuickTest('intermediate')}
+								disabled={isQuickTestLoading}
+								className='bg-yellow-600 text-white py-2 px-3 rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm'
+							>
+								{isQuickTestLoading ? 'Загрузка...' : 'Средний'}
+							</button>
+							<button
+								onClick={() => handleQuickTest('beginner')}
+								disabled={isQuickTestLoading}
+								className='bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm'
+							>
+								{isQuickTestLoading ? 'Загрузка...' : 'Начинающий'}
+							</button>
+							<button
+								onClick={() => handleQuickTest('random')}
+								disabled={isQuickTestLoading}
+								className='bg-purple-600 text-white py-2 px-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm'
+							>
+								{isQuickTestLoading ? 'Загрузка...' : 'Случайно'}
+							</button>
+						</div>
+						<p className='text-xs text-gray-500 text-center mt-2'>
+							Эти кнопки видны только в режиме разработки
+						</p>
 					</div>
-					<p className='text-xs text-gray-500 text-center mt-2'>
-						Эти кнопки видны только в режиме разработки
-					</p>
+				)}
+
+				<div className='bg-gray-100 rounded-lg p-4 mt-2 text-sm text-gray-700'>
+					<div className='font-semibold mb-1'>Что вы получите:</div>
+					<ul className='list-disc list-inside space-y-1'>
+						<li>Определение уровня (Junior/Middle/Senior)</li>
+						<li>Детальный анализ компетенций</li>
+						<li>Персональный план развития от AI</li>
+						<li>Конкретные рекомендации и ресурсы</li>
+					</ul>
 				</div>
-			)}
+			</div>
 		</div>
 	)
 }
