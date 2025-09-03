@@ -192,9 +192,9 @@ jobs:
             # Настраиваем HTTPS с Nginx
             echo "🔒 Настраиваем HTTPS..."
 
-            # Устанавливаем Nginx и Certbot
+            # Устанавливаем только Nginx (без Certbot)
             apt update -y
-            apt install -y nginx certbot python3-certbot-nginx
+            apt install -y nginx
 
             # Останавливаем Nginx для настройки
             systemctl stop nginx
@@ -217,12 +217,9 @@ jobs:
             ufw allow 22
             ufw --force enable
 
-            # Генерируем SSL сертификат
-            echo "🔐 Генерируем SSL сертификат..."
-            certbot --nginx -d evaly.ru -d www.evaly.ru --non-interactive --agree-tos --email admin@example.com
-
-            # Настраиваем автообновление сертификата
-            (crontab -l 2>/dev/null; echo "0 12 * * * /usr/bin/certbot renew --quiet") | crontab -
+            # Используем ваши SSL сертификаты (уже созданы выше)
+            echo "🔐 Используем ваши SSL сертификаты GlobalSign..."
+            echo "✅ SSL сертификаты созданы из GitHub Secrets"
 
             # Перезапускаем Nginx
             systemctl reload nginx
