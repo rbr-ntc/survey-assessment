@@ -22,10 +22,13 @@ services:
   frontend:
     build: ./system-analyst-assessment
     restart: always
-    env_file:
-      - .env
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - NEXT_PUBLIC_API_KEY=wkQ3TikmbIinZW5mixoQsboRBSTpvJyi_eobGTF78WA
+      - NEXT_PUBLIC_ENABLE_QUICK_TEST=true
     ports:
       - 3000:3000
+    command: ['node', '.next/standalone/server.js']
     depends_on:
       - backend
 
