@@ -4,9 +4,9 @@ This file tests if GitHub Actions secrets are working properly.
 
 ## Expected Values:
 
-- FRONTEND_API_URL: http://147.45.166.90:8000
+- FRONTEND_API_URL: https://evaly.ru/api
 - API_KEY: wkQ3TikmbIinZW5mixoQsboRBSTpvJyi_eobGTF78WA
-- CORS_ORIGINS: http://localhost:3000,http://147.45.166.90:3000
+- CORS_ORIGINS: https://evaly.ru
 
 ## Next Steps:
 

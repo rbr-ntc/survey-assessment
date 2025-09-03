@@ -51,7 +51,7 @@ ufw --force enable
 
 # Генерируем SSL сертификат
 echo "🔐 Генерируем SSL сертификат..."
-certbot --nginx -d 147.45.166.90 --non-interactive --agree-tos --email admin@example.com
+certbot --nginx -d evaly.ru -d www.evaly.ru --non-interactive --agree-tos --email admin@example.com
 
 if [ $? -eq 0 ]; then
     echo "✅ SSL сертификат успешно создан!"
@@ -64,7 +64,7 @@ if [ $? -eq 0 ]; then
     systemctl reload nginx
     
     echo "🎉 HTTPS успешно настроен!"
-    echo "🌐 Ваше приложение теперь доступно по адресу: https://147.45.166.90"
+    echo "🌐 Ваше приложение теперь доступно по адресу: https://evaly.ru"
     echo "🔒 Все соединения защищены SSL/TLS"
 else
     echo "❌ Ошибка при создании SSL сертификата"
