@@ -74,15 +74,19 @@ jobs:
             # Удаляем старые образы для экономии места
             docker image prune -f
 
+            # Удаляем старые образы survey-assessment
+            echo "Removing old survey-assessment images..."
+            docker images | grep survey-assessment | awk '{print $3}' | xargs -r docker rmi -f || true
+
             # Обновляем код
             git pull origin main
 
             # Создаем .env файл для production
             cat > .env << EOF
             MONGO_URL=mongodb://mongo:27017/assessment
-            OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
-            API_KEY=${{ env.API_KEY }}
-            CORS_ORIGINS=${{ env.CORS_ORIGINS }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            API_KEY=${{ secrets.API_KEY }}
+            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
             EOF
 
             # Создаем docker-compose.prod.yml для production
@@ -102,20 +106,20 @@ jobs:
                   - MONGO_INITDB_DATABASE=assessment
 
               backend:
-                image: ${{ env.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
+                image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
                 restart: always
                 environment:
                   - MONGO_URL=mongodb://mongo:27017/assessment
                   - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
                   - API_KEY=${{ secrets.API_KEY }}
-                  - OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
+                  - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
                 ports:
                   - "8000:8000"
                 depends_on:
                   - mongo
 
               frontend:
-                image: ${{ env.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
+                image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-frontend:latest
                 restart: always
                 ports:
                   - "3000:3000"
@@ -150,8 +154,17 @@ jobs:
             print('MongoDB initialized successfully with ' + questions.length + ' questions');
             EOF
 
-            # Запускаем контейнеры
-            docker compose -f docker-compose.prod.yml up -d
+            # Принудительно получаем последние образы
+            echo "Pulling latest images..."
+            docker compose -f docker-compose.prod.yml pull
+
+            # Проверяем, что образы обновились
+            echo "Checking image timestamps..."
+            docker images | grep survey-assessment
+
+            # Принудительно перезапускаем контейнеры с новыми образами
+            echo "Starting containers with latest images..."
+            docker compose -f docker-compose.prod.yml up -d --force-recreate
 
             # Ждем запуска MongoDB
             echo "Waiting for MongoDB to start..."
@@ -159,6 +172,10 @@ jobs:
 
             # Проверяем статус
             docker compose -f docker-compose.prod.yml ps
+
+            # Проверяем, что контейнеры запустились с новыми образами
+            echo "Checking container image versions..."
+            docker compose -f docker-compose.prod.yml images
 
             # Проверяем подключение к MongoDB и принудительно импортируем вопросы
             echo "Checking MongoDB connection and importing questions..."
