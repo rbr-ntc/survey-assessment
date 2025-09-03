@@ -105,8 +105,7 @@ async def get_recommendations(req: RecommendationRequest):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_completion_tokens=4000,  # Новый параметр для GPT-5 моделей
-            temperature=1.15
+            max_completion_tokens=4000  # Новый параметр для GPT-5 моделей
         )
         content = response.choices[0].message.content
     except OpenAIError as e:
