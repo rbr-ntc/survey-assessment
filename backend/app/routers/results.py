@@ -13,20 +13,6 @@ from openai import AsyncOpenAI, OpenAIError
 
 router = APIRouter()
 
-LEVELS = [
-    {"level": "Senior", "description": "Экспертный уровень системного аналитика", "nextLevel": "Lead/Architect", "minYears": "5+", "nextLevelScore": 100, "minScore": 85},
-    {"level": "Middle+", "description": "Уверенный Middle с потенциалом роста", "nextLevel": "Senior", "minYears": "3-5", "nextLevelScore": 85, "minScore": 70},
-    {"level": "Middle", "description": "Самостоятельный системный аналитик", "nextLevel": "Middle+", "minYears": "2-3", "nextLevelScore": 70, "minScore": 55},
-    {"level": "Junior+", "description": "Развивающийся Junior", "nextLevel": "Middle", "minYears": "1-2", "nextLevelScore": 55, "minScore": 40},
-    {"level": "Junior", "description": "Начинающий системный аналитик", "nextLevel": "Junior+", "minYears": "0-1", "nextLevelScore": 40, "minScore": 0},
-]
-
-def get_level(score):
-    for lvl in LEVELS:
-        if score >= lvl["minScore"]:
-            return lvl
-    return LEVELS[-1]
-
 async def generate_and_save_recommendations(result_id, user, level, overallScore, strengths, weaknesses, question_details):
     strong_str = ', '.join(f'{s["name"]} ({s["score"]}%)' for s in strengths) or 'Требуют развития'
     weak_str = ', '.join(f'{w["name"]} ({w["score"]}%)' for w in weaknesses) or 'Нет явных'
