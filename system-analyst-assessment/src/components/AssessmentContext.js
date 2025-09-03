@@ -194,10 +194,39 @@ export const AssessmentProvider = ({ children }) => {
 		}
 	}
 
-	const handleStartAssessment = async () => {
-		if (menteeInfo.name && menteeInfo.email && menteeInfo.experience) {
+	const handleStartAssessment = async userInfo => {
+		if (userInfo && userInfo.name && userInfo.email && userInfo.experience) {
+			setMenteeInfo(userInfo)
 			await fetchQuestions()
 			setShowIntro(false)
+		} else if (menteeInfo.name && menteeInfo.email && menteeInfo.experience) {
+			await fetchQuestions()
+			setShowIntro(false)
+		}
+	}
+
+	const startQuickTest = async testType => {
+		setIsLoading(true)
+		setError(null)
+		try {
+			const res = await fetch(`${API_URL}/quick-test`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-api-key': API_KEY,
+				},
+				body: JSON.stringify({ test_type: testType }),
+			})
+			if (!res.ok) throw new Error('Ошибка запуска быстрого теста')
+			const data = await res.json()
+			// Перенаправляем на страницу результатов
+			window.location.href = `/result/${data.test_id}`
+			return data
+		} catch (e) {
+			setError(e.message)
+			throw e
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
@@ -269,6 +298,7 @@ export const AssessmentProvider = ({ children }) => {
 				fetchRecommendations,
 				questions,
 				handleStartAssessment,
+				startQuickTest,
 				calculateResults,
 				getDetailedLevel,
 				getScoreColor,

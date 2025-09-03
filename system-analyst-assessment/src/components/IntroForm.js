@@ -1,8 +1,8 @@
-import { useContext, useState } from 'react'
-import { AssessmentContext } from './AssessmentContext'
+import { useState } from 'react'
+import { useAssessment } from './AssessmentContext'
 
 const IntroForm = () => {
-	const { startAssessment, startQuickTest } = useContext(AssessmentContext)
+	const { handleStartAssessment, startQuickTest } = useAssessment()
 	const [formData, setFormData] = useState({
 		name: '',
 		email: '',
@@ -36,7 +36,7 @@ const IntroForm = () => {
 
 		setIsLoading(true)
 		try {
-			await startAssessment(formData)
+			await handleStartAssessment(formData)
 		} catch (error) {
 			console.error('Error starting assessment:', error)
 			alert('Ошибка при запуске тестирования')
