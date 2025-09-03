@@ -105,7 +105,7 @@ async def get_recommendations(req: RecommendationRequest):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=4000,  # Увеличиваем токены, так как модель дешевле
+            max_completion_tokens=4000,  # Новый параметр для GPT-5 моделей
             temperature=1.15
         )
         content = response.choices[0].message.content
