@@ -24,7 +24,16 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
     # Группируем ошибки по категориям
     errors_by_category = {}
     for qd in incorrect_answers:
-        cat_name = next((cat["name"] for cat in [{"name": "API Design"}, {"name": "Базы данных"}, {"name": "Документирование"}, {"name": "Асинхронные взаимодействия"}, {"name": "Проектирование систем"}, {"name": "Безопасность"}, {"name": "Аналитическое мышление"}, {"name": "Коммуникации"}] if cat["name"] in qd["learning_tip"]), "Общие")
+        # Извлекаем категорию из learning_tip
+        learning_tip = qd["learning_tip"]
+        cat_name = "Общие"
+        
+        # Ищем категорию в learning_tip
+        for cat in CATEGORIES.values():
+            if cat["name"] in learning_tip:
+                cat_name = cat["name"]
+                break
+        
         if cat_name not in errors_by_category:
             errors_by_category[cat_name] = []
         errors_by_category[cat_name].append(qd)
@@ -95,6 +104,7 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
 **Помните: каждый неправильный ответ - это шаг к пониманию!**
 """
     try:
+        print(f"Generating recommendations for result {result_id}")
         client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         response = await client.chat.completions.create(
             model="gpt-5-mini",
@@ -105,10 +115,14 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
             max_completion_tokens=4000  # Новый параметр для GPT-5 моделей
         )
         recommendations = response.choices[0].message.content
+        print(f"Recommendations generated successfully, length: {len(recommendations)}")
     except Exception as e:
         print(f"Error generating recommendations: {str(e)}")
         recommendations = f"Не удалось сгенерировать рекомендации: {str(e)}. Попробуйте позже."
+    
+    print(f"Saving recommendations to database for result {result_id}")
     await db.results.update_one({"_id": ObjectId(result_id)}, {"$set": {"recommendations": recommendations}})
+    print(f"Recommendations saved successfully for result {result_id}")
 
 @router.post("/results", response_model=ResultWithId, dependencies=[Depends(verify_api_key)])
 async def submit_results(submit: SubmitRequest, background_tasks: BackgroundTasks):
