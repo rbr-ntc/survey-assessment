@@ -51,6 +51,7 @@ class RecommendationRequest(BaseModel):
     level: dict
     strengths: list
     weaknesses: list
+    question_details: Optional[List[QuestionDetail]] = None
 
 class RecommendationResponse(BaseModel):
     recommendations: str
