@@ -84,12 +84,12 @@ jobs:
             # Обновляем код
             git pull origin main
 
-            # Создаем .env файл для production
+            # Создаем .env файл для production (если нужен для других целей)
             cat > .env << EOF
-            MONGO_URL=mongodb://survey-assessment-mongo:27017/assessment
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             API_KEY=${{ secrets.API_KEY }}
             CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+            ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
             EOF
 
             # Создаем директорию для SSL сертификатов
@@ -139,7 +139,7 @@ jobs:
                 container_name: survey-assessment-frontend
                 environment:
                   - NODE_ENV=production
-                  - NEXT_PUBLIC_API_URL=https://evaly.ru/api
+                  - NEXT_PUBLIC_API_URL=${{ secrets.FRONTEND_API_URL }}
                   - NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
                   - NEXT_PUBLIC_ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
                 expose:
@@ -152,7 +152,7 @@ jobs:
                 image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
                 container_name: survey-assessment-backend
                 environment:
-                  - MONGO_URL=mongodb://survey-assessment-mongo:27017/assessment
+                  - MONGO_URL=${{ secrets.MONGO_URL }}
                   - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
                   - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
                   - API_KEY=${{ secrets.API_KEY }}
