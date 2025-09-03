@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import { useAssessment } from './AssessmentContext'
 
-const IntroForm = () => {
-	const { handleStartAssessment, startQuickTest } = useAssessment()
+const IntroForm = ({ questionsCount = 0 }) => {
+	const {
+		handleStartAssessment,
+		startQuickTest,
+		questions,
+		isQuestionsLoading,
+	} = useAssessment()
 	const [formData, setFormData] = useState({
 		name: '',
 		email: '',
@@ -62,6 +67,21 @@ const IntroForm = () => {
 			<h2 className='text-2xl font-bold text-center mb-6 text-gray-800'>
 				Системный аналитик - Оценка компетенций
 			</h2>
+
+			{/* Информация о тесте */}
+			<div className='text-center mb-6 text-gray-600'>
+				{isQuestionsLoading ? (
+					<span className='text-sm'>Загрузка вопросов...</span>
+				) : questions.length > 0 ? (
+					<span className='text-sm'>
+						{questions.length} вопросов • 15-20 минут • AI-рекомендации
+					</span>
+				) : (
+					<span className='text-sm'>
+						0 вопросов • 15-20 минут • AI-рекомендации
+					</span>
+				)}
+			</div>
 
 			<form onSubmit={handleSubmit} className='space-y-4'>
 				<div>

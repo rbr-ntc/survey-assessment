@@ -1,5 +1,5 @@
 'use client'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import categories from '../lib/categories'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
@@ -26,7 +26,12 @@ export const AssessmentProvider = ({ children }) => {
 	const [questions, setQuestions] = useState([])
 	const [isQuestionsLoading, setIsQuestionsLoading] = useState(false)
 
-	// Загрузка вопросов с backend только по запросу
+	// Автоматически загружаем вопросы при инициализации компонента
+	useEffect(() => {
+		fetchQuestions()
+	}, []) // Пустой массив зависимостей - выполняется только один раз
+
+	// Загрузка вопросов с backend
 	const fetchQuestions = async () => {
 		setIsQuestionsLoading(true)
 		setError(null)
