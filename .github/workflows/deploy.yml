@@ -252,6 +252,12 @@ jobs:
             echo "Checking image timestamps..."
             docker images | grep survey-assessment
 
+            # Если образы не обновились, принудительно пересобираем
+            if docker images | grep survey-assessment | grep -q "292 years ago"; then
+                echo "⚠️ Образы не обновились, принудительно пересобираем..."
+                docker compose -f docker-compose.prod.yml build --no-cache
+            fi
+
             # Принудительно перезапускаем контейнеры с новыми образами
             echo "Starting containers with latest images..."
             docker compose -f docker-compose.prod.yml up -d --force-recreate
