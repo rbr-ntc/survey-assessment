@@ -152,7 +152,7 @@ jobs:
                 image: ${{ secrets.DOCKERHUB_USERNAME }}/survey-assessment-backend:latest
                 container_name: survey-assessment-backend
                 environment:
-                  - MONGO_URL=${{ secrets.MONGO_URL }}
+                  - MONGO_URL=mongodb://survey-assessment-mongo:27017/assessment
                   - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
                   - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
                   - API_KEY=${{ secrets.API_KEY }}
