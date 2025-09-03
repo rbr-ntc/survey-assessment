@@ -27,6 +27,7 @@ RUN npm run build
 
 # Копируем статические файлы в standalone папку
 RUN cp -r .next/static .next/standalone/.next/static
+RUN cp -r public .next/standalone/
 
 # Запускаем
 EXPOSE 3000
