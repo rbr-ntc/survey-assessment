@@ -22,7 +22,7 @@ services:
     container_name: survey-assessment-frontend
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=https://147.45.166.90/api
+      - NEXT_PUBLIC_API_URL=https://evaly.ru/api
       - NEXT_PUBLIC_API_KEY=${API_KEY}
       - NEXT_PUBLIC_ENABLE_QUICK_TEST=${ENABLE_QUICK_TEST}
     expose:

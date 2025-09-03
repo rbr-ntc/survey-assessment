@@ -118,7 +118,7 @@ jobs:
                 container_name: survey-assessment-frontend
                 environment:
                   - NODE_ENV=production
-                  - NEXT_PUBLIC_API_URL=https://147.45.166.90/api
+                  - NEXT_PUBLIC_API_URL=https://evaly.ru/api
                   - NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}
                   - NEXT_PUBLIC_ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
                 expose:
@@ -199,7 +199,7 @@ jobs:
 
             # Генерируем SSL сертификат
             echo "🔐 Генерируем SSL сертификат..."
-            certbot --nginx -d 147.45.166.90 --non-interactive --agree-tos --email admin@example.com
+            certbot --nginx -d evaly.ru -d www.evaly.ru --non-interactive --agree-tos --email admin@example.com
 
             # Настраиваем автообновление сертификата
             (crontab -l 2>/dev/null; echo "0 12 * * * /usr/bin/certbot renew --quiet") | crontab -
