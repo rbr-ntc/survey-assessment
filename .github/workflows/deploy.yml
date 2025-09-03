@@ -269,14 +269,14 @@ jobs:
 
             # Проверяем подключение к MongoDB и принудительно импортируем вопросы
             echo "Checking MongoDB connection and importing questions..."
-            docker exec survey-assessment-mongo-1 mongosh --eval "db.runCommand('ping')" assessment
+            docker exec survey-assessment-mongo mongosh --eval "db.runCommand('ping')" assessment
 
             # Принудительно импортируем вопросы (на случай если init.js не сработал)
             echo "Forcing questions import..."
-            docker exec survey-assessment-mongo-1 mongoimport --db assessment --collection questions --drop --file /docker-entrypoint-initdb.d/improved-test-questions.json --jsonArray
+            docker exec survey-assessment-mongo mongoimport --db assessment --collection questions --drop --file /docker-entrypoint-initdb.d/improved-test-questions.json --jsonArray
 
             # Проверяем количество вопросов
             echo "Checking questions count..."
-            docker exec survey-assessment-mongo-1 mongosh --eval "db.questions.countDocuments()" assessment
+            docker exec survey-assessment-mongo mongosh --eval "db.questions.countDocuments()" assessment
 
             echo "Deployment completed successfully!"
