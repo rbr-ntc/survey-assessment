@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAssessment } from './AssessmentContext'
+import TestRulesModal from './TestRulesModal'
 
 const experienceOptions = [
 	'Меньше года',
@@ -23,6 +24,7 @@ const IntroForm = ({ questionsCount = 0 }) => {
 	})
 	const [isLoading, setIsLoading] = useState(false)
 	const [isQuickTestLoading, setIsQuickTestLoading] = useState(false)
+	const [showRulesModal, setShowRulesModal] = useState(false)
 
 	// Проверяем, включены ли quick-test
 	const isQuickTestEnabled =
@@ -47,6 +49,11 @@ const IntroForm = ({ questionsCount = 0 }) => {
 			return
 		}
 
+		// Показываем модальное окно с правилами
+		setShowRulesModal(true)
+	}
+
+	const handleStartTest = async () => {
 		setIsLoading(true)
 		try {
 			await handleStartAssessment(formData)
@@ -230,6 +237,16 @@ const IntroForm = ({ questionsCount = 0 }) => {
 					</div>
 				</div>
 			</div>
+
+			{/* Модальное окно с правилами тестирования */}
+			<TestRulesModal
+				isOpen={showRulesModal}
+				onClose={() => setShowRulesModal(false)}
+				onConfirm={() => {
+					setShowRulesModal(false)
+					handleStartTest()
+				}}
+			/>
 		</div>
 	)
 }
