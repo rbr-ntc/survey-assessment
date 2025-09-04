@@ -42,7 +42,7 @@ export default function ResultPageClient({ params }) {
 			cancelled = true
 			if (pollingRef.current) clearInterval(pollingRef.current)
 		}
-	}, [id])
+	}, [id, startPolling])
 
 	// Polling только для рекомендаций
 	function startPolling() {

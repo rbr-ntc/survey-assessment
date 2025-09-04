@@ -56,7 +56,7 @@ export const metadata = {
 		canonical: 'https://evaly.ru',
 	},
 	verification: {
-		google: 'your-google-verification-code', // Замените на ваш код
+		google: 'yZRBAnn_3C8ipP1yom8Fplj6tWSqSISXOHRAINH2YBg', // Замените на вашкод
 		yandex: 'your-yandex-verification-code', // Замените на ваш код
 	},
 	other: {

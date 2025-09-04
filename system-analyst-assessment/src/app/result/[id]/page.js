@@ -1,3 +1,5 @@
+import ResultPageClient from './ResultPageClient'
+
 // Генерируем мета-теги для страницы результатов
 export async function generateMetadata({ params }) {
 	const { id } = params
