@@ -56,8 +56,8 @@ export const metadata = {
 		canonical: 'https://evaly.ru',
 	},
 	verification: {
-		google: 'yZRBAnn_3C8ipP1yom8Fplj6tWSqSISXOHRAINH2YBg', // Замените на вашкод
-		yandex: 'your-yandex-verification-code', // Замените на ваш код
+		google: 'yZRBAnn_3C8ipP1yom8Fplj6tWSqSISXOHRAINH2YBg',
+		yandex: '697f7b063b705153',
 	},
 	other: {
 		'msapplication-TileColor': '#3b82f6',
