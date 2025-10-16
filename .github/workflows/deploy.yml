@@ -68,16 +68,19 @@ jobs:
             # Переходим в директорию проекта
             cd /opt/survey-assessment
 
-            # Останавливаем существующие контейнеры если они запущены
-            if docker compose ps | grep -q "Up"; then
-              echo "Stopping existing containers..."
-              docker compose down
-            fi
+            # Принудительно останавливаем ВСЕ контейнеры survey-assessment
+            echo "Force stopping all survey-assessment containers..."
+            docker ps -a --filter "name=survey-assessment" --format "table {{.Names}}" | grep -v NAMES | xargs -r docker stop || true
+            docker ps -a --filter "name=survey-assessment" --format "table {{.Names}}" | grep -v NAMES | xargs -r docker rm -f || true
+
+            # Останавливаем существующие контейнеры через compose
+            echo "Stopping containers via docker compose..."
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
 
             # Удаляем старые образы для экономии места
             docker image prune -f
 
-            # Удаляем старые образы survey-assessment
+            # Удаляем старые образы survey-assessment (только если не используются)
             echo "Removing old survey-assessment images..."
             docker images | grep survey-assessment | awk '{print $3}' | xargs -r docker rmi -f || true
 
@@ -252,15 +255,9 @@ jobs:
             echo "Checking image timestamps..."
             docker images | grep survey-assessment
 
-            # Если образы не обновились, принудительно пересобираем
-            if docker images | grep survey-assessment | grep -q "292 years ago"; then
-                echo "⚠️ Образы не обновились, принудительно пересобираем..."
-                docker compose -f docker-compose.prod.yml build --no-cache
-            fi
-
             # Принудительно перезапускаем контейнеры с новыми образами
             echo "Starting containers with latest images..."
-            docker compose -f docker-compose.prod.yml up -d --force-recreate
+            docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
 
             # Ждем запуска MongoDB
             echo "Waiting for MongoDB to start..."
@@ -272,6 +269,14 @@ jobs:
             # Проверяем, что контейнеры запустились с новыми образами
             echo "Checking container image versions..."
             docker compose -f docker-compose.prod.yml images
+
+            # Проверяем, что контейнеры действительно используют новые образы
+            echo "Verifying containers are using latest images..."
+            docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
+            
+            # Проверяем, что frontend контейнер запущен и работает
+            echo "Checking frontend container health..."
+            docker exec survey-assessment-frontend node --version || echo "Frontend container not responding"
 
             # Проверяем подключение к MongoDB и принудительно импортируем вопросы
             echo "Checking MongoDB connection and importing questions..."
