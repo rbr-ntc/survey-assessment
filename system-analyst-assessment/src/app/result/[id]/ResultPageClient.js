@@ -1,5 +1,5 @@
 'use client'
-import { use, useEffect, useRef, useState, useCallback } from 'react'
+import { use, useCallback, useEffect, useRef, useState } from 'react'
 import ResultsScreen from '../../../components/ResultsScreen'
 
 export default function ResultPageClient({ params }) {
@@ -19,10 +19,13 @@ export default function ResultPageClient({ params }) {
 			try {
 				const controller = new AbortController()
 				const timeoutId = setTimeout(() => controller.abort(), 12000)
-				const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/results/${id}`, {
-					headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY },
-					signal: controller.signal,
-				})
+				const res = await fetch(
+					`${process.env.NEXT_PUBLIC_API_URL}/results/${id}`,
+					{
+						headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY },
+						signal: controller.signal,
+					}
+				)
 				clearTimeout(timeoutId)
 				if (res.status === 401) throw new Error('Нет доступа (API Key)')
 				if (res.status === 404) throw new Error('Результат не найден')
@@ -54,20 +57,27 @@ export default function ResultPageClient({ params }) {
 			try {
 				const controller = new AbortController()
 				const timeoutId = setTimeout(() => controller.abort(), 10000)
-				const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/results/${id}`, {
-					headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY },
-					signal: controller.signal,
-				})
+				const res = await fetch(
+					`${process.env.NEXT_PUBLIC_API_URL}/results/${id}`,
+					{
+						headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY },
+						signal: controller.signal,
+					}
+				)
 				clearTimeout(timeoutId)
 				if (!res.ok) return
 				const data = await res.json()
 				if (data.recommendations) {
-					setResult(prev => ({ ...prev, recommendations: data.recommendations }))
+					setResult(prev => ({
+						...prev,
+						recommendations: data.recommendations,
+					}))
 					clearInterval(pollingRef.current)
 					pollingRef.current = null
 				}
 			} catch {}
-			if (attempts >= 120) { // ~6 минут
+			if (attempts >= 120) {
+				// ~6 минут
 				clearInterval(pollingRef.current)
 				pollingRef.current = null
 			}
