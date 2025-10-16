@@ -1,5 +1,5 @@
 'use client'
-import { use, useEffect, useRef, useState } from 'react'
+import { use, useEffect, useRef, useState, useCallback } from 'react'
 import ResultsScreen from '../../../components/ResultsScreen'
 
 export default function ResultPageClient({ params }) {
@@ -17,22 +17,23 @@ export default function ResultPageClient({ params }) {
 			setLoading(true)
 			setError(null)
 			try {
-				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_API_URL}/results/${id}`,
-					{
-						headers: {
-							'x-api-key': process.env.NEXT_PUBLIC_API_KEY,
-						},
-					}
-				)
-				if (!res.ok) throw new Error('Результат не найден')
+				const controller = new AbortController()
+				const timeoutId = setTimeout(() => controller.abort(), 12000)
+				const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/results/${id}`, {
+					headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY },
+					signal: controller.signal,
+				})
+				clearTimeout(timeoutId)
+				if (res.status === 401) throw new Error('Нет доступа (API Key)')
+				if (res.status === 404) throw new Error('Результат не найден')
+				if (!res.ok) throw new Error('Ошибка загрузки результата')
 				const data = await res.json()
 				if (!cancelled) setResult(data)
 				if (!data.recommendations && !pollingRef.current) {
 					startPolling()
 				}
 			} catch (e) {
-				if (!cancelled) setError(e.message)
+				if (!cancelled) setError(e?.message || 'Ошибка загрузки')
 			} finally {
 				if (!cancelled) setLoading(false)
 			}
@@ -44,31 +45,34 @@ export default function ResultPageClient({ params }) {
 		}
 	}, [id, startPolling])
 
-	// Polling только для рекомендаций
-	function startPolling() {
+	// Polling только для рекомендаций (стабилизированный)
+	const startPolling = useCallback(() => {
+		if (pollingRef.current) return
+		let attempts = 0
 		pollingRef.current = setInterval(async () => {
+			attempts += 1
 			try {
-				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_API_URL}/results/${id}`,
-					{
-						headers: {
-							'x-api-key': process.env.NEXT_PUBLIC_API_KEY,
-						},
-					}
-				)
+				const controller = new AbortController()
+				const timeoutId = setTimeout(() => controller.abort(), 10000)
+				const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/results/${id}`, {
+					headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY },
+					signal: controller.signal,
+				})
+				clearTimeout(timeoutId)
 				if (!res.ok) return
 				const data = await res.json()
 				if (data.recommendations) {
-					setResult(prev => ({
-						...prev,
-						recommendations: data.recommendations,
-					}))
+					setResult(prev => ({ ...prev, recommendations: data.recommendations }))
 					clearInterval(pollingRef.current)
 					pollingRef.current = null
 				}
 			} catch {}
+			if (attempts >= 120) { // ~6 минут
+				clearInterval(pollingRef.current)
+				pollingRef.current = null
+			}
 		}, 3000)
-	}
+	}, [id])
 
 	if (loading) return <div className='p-8 text-center'>Загрузка...</div>
 	if (error) return <div className='p-8 text-center text-red-500'>{error}</div>
