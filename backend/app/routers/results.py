@@ -112,7 +112,7 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_completion_tokens=4000  # Новый параметр для GPT-5 моделей
+            max_output_tokens=4000
         )
         recommendations = response.choices[0].message.content
         print(f"Recommendations generated successfully, length: {len(recommendations)}")

@@ -197,6 +197,37 @@ const ResultsScreen = ({
 					{/* AI-рекомендации */}
 					{aiRecommendations && (
 						<div className='mb-8'>
+							{/* Плашка поддержки над рекомендациями */}
+							<div className='mb-6 text-center'>
+								<div className='bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6'>
+									<div className='flex items-center justify-center gap-3 mb-4'>
+										<div className='text-2xl'>☕</div>
+										<h3 className='text-lg font-semibold text-gray-800'>
+											Спасибо за прохождение теста!
+										</h3>
+									</div>
+									<p className='text-gray-600 mb-4'>
+										Если результаты оказались полезными, вы можете поддержать
+										развитие проекта
+									</p>
+									<button
+										onClick={() =>
+											window.open(
+												'https://donate.stream/donate_68f0f783320e3',
+												'_blank'
+											)
+										}
+										className='px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition font-semibold flex items-center gap-2 mx-auto'
+									>
+										<span>💜</span>
+										Поддержать проект
+									</button>
+									<p className='text-xs text-gray-500 mt-3'>
+										Добровольная поддержка • Не является оплатой услуг
+									</p>
+								</div>
+							</div>
+
 							<h2 className='text-2xl font-bold mb-4'>
 								AI-рекомендации для развития
 							</h2>
