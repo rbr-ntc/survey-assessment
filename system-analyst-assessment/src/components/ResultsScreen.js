@@ -451,6 +451,36 @@ const ResultsScreen = ({
 											</button>
 										</div>
 									</div>
+
+									{/* Donate.Stream */}
+									<div className='border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition'>
+										<div className='flex items-center justify-between'>
+											<div className='flex items-center gap-3'>
+												<div className='w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white font-bold'>
+													DS
+												</div>
+												<div>
+													<h4 className='font-semibold text-gray-800'>
+														Donate.Stream
+													</h4>
+													<p className='text-sm text-gray-600'>
+														Для стримеров и контент-мейкеров
+													</p>
+												</div>
+											</div>
+											<button
+												onClick={() =>
+													window.open(
+														'https://donate.stream/your-username',
+														'_blank'
+													)
+												}
+												className='px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition'
+											>
+												Поддержать
+											</button>
+										</div>
+									</div>
 								</div>
 							</div>
 
