@@ -105,7 +105,7 @@ async def get_recommendations(req: RecommendationRequest):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_output_tokens=4000
+            max_completion_tokens=4000
         )
         content = response.choices[0].message.content
     except OpenAIError as e:
