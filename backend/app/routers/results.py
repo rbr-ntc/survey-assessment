@@ -112,7 +112,9 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_completion_tokens=4000
+            max_completion_tokens=4000,
+            reasoning_effort="minimal",
+            verbosity="high"
         )
         recommendations = response.choices[0].message.content
         print(f"Recommendations generated successfully, length: {len(recommendations)}")
