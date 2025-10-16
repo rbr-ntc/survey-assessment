@@ -281,11 +281,18 @@ const ResultsScreen = ({
 								<p className='text-lg text-gray-700 mb-4'>
 									Спасибо, что прошли тестирование! 🎉
 								</p>
-								<p className='text-gray-600'>
+								<p className='text-gray-600 mb-4'>
 									Если результаты оказались полезными, вы можете поддержать
 									развитие проекта. Это поможет улучшать тесты, добавлять новые
 									вопросы и развивать AI-рекомендации.
 								</p>
+								<div className='bg-purple-50 border border-purple-200 rounded-lg p-3'>
+									<p className='text-sm text-purple-800'>
+										<strong>💡 Совет:</strong> Рекомендуем использовать Boosty —
+										это удобная платформа для поддержки проектов в России с
+										ежедневными выплатами и низкими комиссиями.
+									</p>
+								</div>
 							</div>
 
 							{/* Важное уведомление */}
@@ -383,19 +390,35 @@ const ResultsScreen = ({
 													<p className='text-sm text-gray-600'>
 														Подписка и разовые донаты
 													</p>
+													<p className='text-xs text-purple-600'>
+														⭐ Рекомендуется
+													</p>
 												</div>
 											</div>
-											<button
-												onClick={() =>
-													window.open(
-														'https://boosty.to/your-profile',
-														'_blank'
-													)
-												}
-												className='px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition'
-											>
-												Поддержать
-											</button>
+											<div className='flex flex-col gap-2'>
+												<button
+													onClick={() =>
+														window.open(
+															'https://boosty.to/survey-assessment/donate',
+															'_blank'
+														)
+													}
+													className='px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm'
+												>
+													Разовый донат
+												</button>
+												<button
+													onClick={() =>
+														window.open(
+															'https://boosty.to/survey-assessment',
+															'_blank'
+														)
+													}
+													className='px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm'
+												>
+													Подписка
+												</button>
+											</div>
 										</div>
 									</div>
 
