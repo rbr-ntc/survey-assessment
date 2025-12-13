@@ -88,7 +88,7 @@ const QuestionScreen = ({
 						key={option.value}
 						className={`
 							flex items-center gap-3 px-5 py-3 rounded-xl border-2 cursor-pointer transition-all select-none
-							min-h-[56px] max-w-full
+							min-h-[56px] max-w-full focus-within:ring-2 focus-within:ring-blue-400 focus-within:ring-offset-2
 							$ {
 								answers[question.id] === option.value
 									? 'border-blue-400 bg-blue-50'
@@ -102,7 +102,7 @@ const QuestionScreen = ({
 							value={option.value}
 							checked={answers[question.id] === option.value}
 							onChange={() => handleAnswer(option.value)}
-							className='hidden'
+							className='sr-only'
 						/>
 						<span
 							className={`
