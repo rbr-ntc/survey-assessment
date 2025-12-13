@@ -103,42 +103,71 @@ const IntroForm = ({ questionsCount = 0 }) => {
 				</div>
 
 				<form className='flex flex-col gap-4' onSubmit={handleSubmit}>
-					<input
-						className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition placeholder-gray-400 bg-white text-gray-900'
-						type='text'
-						name='name'
-						placeholder='Ваше имя'
-						value={formData.name}
-						onChange={handleInputChange}
-						required
-					/>
-					<input
-						className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition placeholder-gray-400 bg-white text-gray-900'
-						type='email'
-						name='email'
-						placeholder='Email'
-						value={formData.email}
-						onChange={handleInputChange}
-						required
-					/>
-					<p className='text-xs text-gray-500 -mt-2'>
-						Email используется только для идентификации результатов и не
-						сохраняется в базе данных
-					</p>
-					<select
-						className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition bg-white text-gray-900'
-						name='experience'
-						value={formData.experience}
-						onChange={handleInputChange}
-						required
-					>
-						<option value=''>Опыт в системном анализе</option>
-						{experienceOptions.map(opt => (
-							<option key={opt} value={opt}>
-								{opt}
-							</option>
-						))}
-					</select>
+					<div className='flex flex-col gap-1'>
+						<label
+							htmlFor='name'
+							className='text-sm font-medium text-gray-700 ml-1'
+						>
+							Ваше имя <span className='text-red-500'>*</span>
+						</label>
+						<input
+							id='name'
+							className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition placeholder-gray-400 bg-white text-gray-900'
+							type='text'
+							name='name'
+							placeholder='Введите ваше имя'
+							value={formData.name}
+							onChange={handleInputChange}
+							required
+						/>
+					</div>
+
+					<div className='flex flex-col gap-1'>
+						<label
+							htmlFor='email'
+							className='text-sm font-medium text-gray-700 ml-1'
+						>
+							Email <span className='text-red-500'>*</span>
+						</label>
+						<input
+							id='email'
+							className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition placeholder-gray-400 bg-white text-gray-900'
+							type='email'
+							name='email'
+							placeholder='example@email.com'
+							value={formData.email}
+							onChange={handleInputChange}
+							required
+						/>
+						<p className='text-xs text-gray-500 mt-1 ml-1'>
+							Email используется только для идентификации результатов и не
+							сохраняется в базе данных
+						</p>
+					</div>
+
+					<div className='flex flex-col gap-1'>
+						<label
+							htmlFor='experience'
+							className='text-sm font-medium text-gray-700 ml-1'
+						>
+							Опыт работы <span className='text-red-500'>*</span>
+						</label>
+						<select
+							id='experience'
+							className='w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition bg-white text-gray-900'
+							name='experience'
+							value={formData.experience}
+							onChange={handleInputChange}
+							required
+						>
+							<option value=''>Выберите опыт в системном анализе</option>
+							{experienceOptions.map(opt => (
+								<option key={opt} value={opt}>
+									{opt}
+								</option>
+							))}
+						</select>
+					</div>
 					<button
 						type='submit'
 						className='w-full py-3 rounded-lg bg-blue-400 text-white font-semibold text-lg shadow-sm hover:bg-blue-500 transition disabled:bg-gray-300 disabled:cursor-not-allowed'
