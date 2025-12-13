@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     
     # Database
-    MONGO_URL: str = "mongodb://mongo:27017/assessment"
+    MONGO_URL: str
     
     # CORS
     CORS_ORIGINS: str = os.environ.get("CORS_ORIGINS", "http://localhost:3000")
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     OPENAI_TEMPERATURE: float = 1.15
     
     # Security
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # Logging

@@ -38,7 +38,9 @@ services:
       - CORS_ORIGINS=${CORS_ORIGINS}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - API_KEY=${API_KEY}
+      - SECRET_KEY=${SECRET_KEY}
       - ENABLE_QUICK_TEST=${ENABLE_QUICK_TEST}
+      - MONGO_URL=${MONGO_URL}
     expose:
       - '8000'
     restart: unless-stopped
@@ -50,6 +52,8 @@ services:
     container_name: survey-assessment-mongo
     environment:
       - MONGO_INITDB_DATABASE=assessment
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - mongo_data:/data/db
       - ./mongo-init:/docker-entrypoint-initdb.d

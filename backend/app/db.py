@@ -1,7 +1,5 @@
-import os
-
+from app.config import settings
 from motor.motor_asyncio import AsyncIOMotorClient
 
-MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncIOMotorClient(settings.MONGO_URL)
 db = client["assessment"]
