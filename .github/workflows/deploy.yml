@@ -19,8 +19,6 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
       ENABLE_QUICK_TEST: ${{ secrets.ENABLE_QUICK_TEST }}
-      MONGO_URL: ${{ secrets.MONGO_URL }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     steps:
       - name: Checkout code
@@ -161,7 +159,6 @@ jobs:
                   - CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
                   - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
                   - API_KEY=${{ secrets.API_KEY }}
-                  - SECRET_KEY=${{ secrets.SECRET_KEY }}
                   - ENABLE_QUICK_TEST=${{ secrets.ENABLE_QUICK_TEST }}
                 expose:
                   - "8000"
