@@ -90,7 +90,7 @@ body {
 
 ::selection {
 	background: var(--primary);
-	color: #fff;
+	color: var(--primary-foreground);
 }
 
 /* Custom Utilities */
@@ -105,8 +105,6 @@ body {
         text-wrap: balance;
     }
 }
-
-/* Место для кастомных стилей ниже */
 
 @theme inline {
 	--radius-sm: calc(var(--radius) - 4px);

@@ -155,7 +155,7 @@ const QuestionScreen = ({
 				</div>
 			</div>
 		</div>
-	</div>
-)
+	)
+}
 
 export default QuestionScreen
