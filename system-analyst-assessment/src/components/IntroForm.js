@@ -82,7 +82,7 @@ const IntroForm = ({ questionsCount = 0 }) => {
 		<div className='flex items-center justify-center min-h-screen p-4'>
 			<div className='w-full max-w-lg bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-slate-100 p-8 md:p-12 flex flex-col gap-8 transition-all duration-300'>
 				<div className='flex flex-col items-center gap-4 text-center'>
-					<div className='w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 transform rotate-3'>
+					<div className='w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 transform rotate-3' aria-hidden="true">
 						<span className='text-3xl text-white'>🎯</span>
 					</div>
 					<div>
@@ -170,7 +170,7 @@ const IntroForm = ({ questionsCount = 0 }) => {
 										</option>
 									))}
 								</select>
-								<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+								<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" aria-hidden="true">
 									<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 										<path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 									</svg>
@@ -213,7 +213,7 @@ const IntroForm = ({ questionsCount = 0 }) => {
 					</div>
 
 					<div className='flex items-center justify-center gap-2 text-xs text-slate-400'>
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 							<path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
 							<path d="M12 16V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
 							<path d="M12 8H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

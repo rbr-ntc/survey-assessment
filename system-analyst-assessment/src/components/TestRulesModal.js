@@ -15,8 +15,9 @@ const TestRulesModal = ({ isOpen, onClose, onConfirm }) => {
 					<button
 						onClick={onClose}
 						className='text-gray-400 hover:text-gray-600 text-2xl font-bold'
+						aria-label="Закрыть"
 					>
-						×
+						<span aria-hidden="true">×</span>
 					</button>
 				</div>
 
