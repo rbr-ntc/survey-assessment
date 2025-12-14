@@ -33,7 +33,7 @@ const QuestionTypeBadge = ({ type }) => {
 		<span
 			className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${style.className}`}
 		>
-			<span>{style.icon}</span>
+			<span aria-hidden="true">{style.icon}</span>
 			{style.label}
 		</span>
 	)
@@ -57,7 +57,7 @@ const QuestionScreen = ({
 			<div className='mb-8 flex flex-col gap-4'>
 				<div className='flex items-center justify-between text-sm font-medium text-slate-500'>
 					<span className='flex items-center gap-2'>
-						<span className='text-lg'>{category.icon}</span>
+						<span className='text-lg' aria-hidden="true">{category.icon}</span>
 						<span className='text-slate-900'>{category.name}</span>
 					</span>
 					<span>
@@ -105,7 +105,7 @@ const QuestionScreen = ({
 									value={option.value}
 									checked={isSelected}
 									onChange={() => handleAnswer(option.value)}
-									className='hidden'
+									className='sr-only'
 								/>
 
 								{/* Radio Circle */}
