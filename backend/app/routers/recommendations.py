@@ -99,17 +99,16 @@ async def get_recommendations(req: RecommendationRequest):
 
     try:
         client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        response = await client.chat.completions.create(
-            model="gpt-5-mini",
-            messages=[
+        response = await client.responses.create(
+            model="gpt-5.2-mini",
+            reasoning={"effort": "medium"},
+            input=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_completion_tokens=4000,
-            reasoning_effort="minimal",
-            verbosity="high"
+            max_output_tokens=4000
         )
-        content = response.choices[0].message.content
+        content = response.output_text
     except OpenAIError as e:
         print(f"OpenAI error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"OpenAI error: {str(e)}")
