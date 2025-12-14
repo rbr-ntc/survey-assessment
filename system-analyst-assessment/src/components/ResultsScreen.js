@@ -1,14 +1,87 @@
 import { Confetti } from '@/components/magicui/confetti'
 import { Button } from '@/components/ui/button'
 import 'highlight.js/styles/github.css'
-import { ArrowRight, BookOpen, CheckCircle, ChevronRight, Copy, Award, TrendingUp, Zap, BarChart3, Share2, RefreshCw } from 'lucide-react'
+import {
+    BookOpen,
+    Zap,
+    BarChart3,
+    Share2,
+    RefreshCw,
+    Award,
+    TrendingUp,
+    Code,
+    Database,
+    Globe,
+    Lock,
+    Users,
+    Layout,
+    Server,
+    FileText,
+    Copy,
+    CheckCircle
+} from 'lucide-react'
 import { useEffect, useRef, useState, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import remarkGfm from 'remark-gfm'
 import AILoader from './AILoader'
 
-// Expert tips dictionary based on categories
+// Helper to get category icon
+const getCategoryIcon = (key) => {
+    const icons = {
+        documentation: FileText,
+        modeling: Layout,
+        api: Globe,
+        database: Database,
+        messaging: Server,
+        system_design: Code,
+        security: Lock,
+        analytical: TrendingUp,
+        communication: Users,
+    };
+    return icons[key] || Zap;
+};
+
+// Helper to determine skill level based on score
+const getSkillLevel = (score) => {
+    if (score >= 90) return { label: 'Senior', color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-200' };
+    if (score >= 70) return { label: 'Middle', color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' };
+    if (score >= 40) return { label: 'Junior', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' };
+    return { label: 'Novice', color: 'text-slate-500', bg: 'bg-slate-50 border-slate-200' };
+};
+
+// Short actionable advice per category based on score ranges
+const getCategoryAdvice = (categoryKey, score) => {
+    const advice = {
+        documentation: {
+            low: "Изучите шаблоны User Story и Use Case.",
+            mid: "Освойте Docs as Code (Mermaid, AsciiDoc).",
+            high: "Внедряйте стандарты документации в команду."
+        },
+        modeling: {
+            low: "Разберитесь с базовыми нотациями BPMN.",
+            mid: "Практикуйте сложные диаграммы состояний.",
+            high: "Оптимизируйте бизнес-процессы через модели."
+        },
+        api: {
+            low: "Поймите разницу между GET и POST.",
+            mid: "Изучите RESTful Best Practices и Swagger.",
+            high: "Проектируйте Backward Compatible API."
+        },
+        database: {
+            low: "Освойте SELECT, JOIN и типы данных.",
+            mid: "Разберитесь с индексами и нормализацией.",
+            high: "Изучите NoSQL и оптимизацию запросов."
+        },
+        // Fallbacks for others...
+    };
+
+    const level = score >= 80 ? 'high' : score >= 50 ? 'mid' : 'low';
+    return advice[categoryKey]?.[level] || "Продолжайте практиковаться и изучать новые материалы.";
+};
+
+
+// Expert tips dictionary based on categories (expanded)
 const EXPERT_TIPS = {
 	documentation: {
 		title: 'Документация как продукт',
@@ -63,11 +136,9 @@ const ResultsScreen = ({
 	const [copied, setCopied] = useState(false)
 	const confettiRef = useRef(null)
 
-    // Calculate percentile (mock logic for demo: better score = higher percentile)
-    // In a real app, this would come from the backend distribution
+    // Calculate percentile (mock logic for demo)
     const percentile = useMemo(() => {
         const base = results.overallScore;
-        // Simple curve: 50 -> 30%, 70 -> 60%, 80 -> 80%, 90 -> 95%
         let p = 0;
         if (base < 40) p = base * 0.5;
         else if (base < 60) p = 20 + (base - 40);
@@ -76,7 +147,7 @@ const ResultsScreen = ({
         return Math.min(99, Math.round(p));
     }, [results.overallScore]);
 
-    // Find the weakest category to show a relevant tip
+    // Find the weakest category
     const weakestCategory = useMemo(() => {
         if (!results.categories) return null;
         const sorted = Object.entries(results.categories).sort(([, a], [, b]) => a.score - b.score);
@@ -97,14 +168,6 @@ const ResultsScreen = ({
 		}
 	}, [])
 
-    const getGradeLabel = (score) => {
-        if (score >= 90) return { label: 'S', color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-200' };
-        if (score >= 80) return { label: 'A', color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' };
-        if (score >= 60) return { label: 'B', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' };
-        if (score >= 40) return { label: 'C', color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' };
-        return { label: 'D', color: 'text-rose-600', bg: 'bg-rose-50 border-rose-200' };
-    };
-
 	return (
 		<div className='min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 selection:text-indigo-900 pb-24'>
 			<Confetti
@@ -123,7 +186,7 @@ const ResultsScreen = ({
                  </div>
             </div>
 
-			<div className='max-w-3xl mx-auto px-4 pt-12'>
+			<div className='max-w-4xl mx-auto px-4 pt-12'>
 
                 {/* 1. Hero / Digest Header */}
                 <div className="mb-16 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -139,7 +202,7 @@ const ResultsScreen = ({
                 </div>
 
                 {/* 2. Main Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {/* Score Card */}
                     <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl shadow-slate-200/50 flex flex-col justify-between relative overflow-hidden group hover:border-indigo-200 transition-colors">
                         <div className="absolute top-0 right-0 p-32 bg-indigo-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 group-hover:opacity-80 transition-opacity"></div>
@@ -200,7 +263,7 @@ const ResultsScreen = ({
                     </div>
                 </div>
 
-                {/* 3. Expert Insight Section (New Feature) */}
+                {/* 3. Expert Insight Section (Highlighted Weakness) */}
                 {expertTip && (
                      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-3xl p-8 mb-12 relative overflow-hidden">
                          <div className="absolute top-4 right-4 text-amber-500/20">
@@ -213,7 +276,7 @@ const ResultsScreen = ({
                                 </div>
                                 <div>
                                     <div className="text-xs font-bold text-amber-600 uppercase tracking-wide">Совет эксперта</div>
-                                    <div className="font-bold text-slate-900">Для роста в: {weakestCategory[1].name}</div>
+                                    <div className="font-bold text-slate-900">Зона роста: {weakestCategory[1].name}</div>
                                 </div>
                              </div>
                              <h3 className="text-xl font-bold text-slate-900 mb-2">&quot;{expertTip.title}&quot;</h3>
@@ -224,48 +287,64 @@ const ResultsScreen = ({
                      </div>
                 )}
 
-                {/* 4. Skills Breakdown (Redesigned) */}
+                {/* 4. Skills Breakdown (New Grid Layout) */}
                 <div className="mb-16">
-                     <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                        <BarChart3 className="w-6 h-6 text-indigo-600" />
-                        Срез компетенций
-                     </h2>
-                     <div className="space-y-4">
+                     <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                            <BarChart3 className="w-6 h-6 text-indigo-600" />
+                            Карта компетенций
+                        </h2>
+                     </div>
+
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {Object.entries(results.categories)
                             .sort(([, a], [, b]) => b.score - a.score)
                             .map(([key, data]) => {
-                                const grade = getGradeLabel(data.score);
+                                const Icon = getCategoryIcon(key);
+                                const skillInfo = getSkillLevel(data.score);
+                                const advice = getCategoryAdvice(key, data.score);
+
                                 return (
-                                    <div key={key} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold shrink-0 ${grade.bg} ${grade.color}`}>
-                                            {grade.label}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-center mb-1">
-                                                <div className="font-bold text-slate-900 truncate pr-4">{data.name}</div>
-                                                <div className="font-bold text-slate-700">{data.score}%</div>
+                                    <div key={key} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-lg hover:border-indigo-200 transition-all duration-300 flex flex-col">
+
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="p-3 bg-slate-50 rounded-xl text-slate-600">
+                                                <Icon className="w-6 h-6" />
                                             </div>
-                                            <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                                                <div
-                                                    className="h-full rounded-full transition-all duration-1000"
-                                                    style={{
-                                                        width: `${data.score}%`,
-                                                        backgroundColor: data.score >= 80 ? '#10b981' : data.score >= 60 ? '#6366f1' : '#f59e42'
-                                                    }}
-                                                />
-                                            </div>
+                                            <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${skillInfo.bg} ${skillInfo.color}`}>
+                                                {skillInfo.label}
+                                            </span>
                                         </div>
+
+                                        <h3 className="font-bold text-slate-900 text-lg mb-1">{data.name}</h3>
+                                        <div className="text-3xl font-bold text-slate-900 mb-4">
+                                            {data.score}<span className="text-lg text-slate-400 font-medium">%</span>
+                                        </div>
+
+                                        <div className="w-full bg-slate-100 rounded-full h-1.5 mb-4 overflow-hidden">
+                                            <div
+                                                className="h-full rounded-full transition-all duration-1000"
+                                                style={{
+                                                    width: `${data.score}%`,
+                                                    backgroundColor: data.score >= 80 ? '#10b981' : data.score >= 60 ? '#6366f1' : '#f59e42'
+                                                }}
+                                            />
+                                        </div>
+
+                                        <p className="text-xs text-slate-500 mt-auto pt-4 border-t border-slate-50 leading-relaxed">
+                                            {advice}
+                                        </p>
                                     </div>
                                 );
                             })}
                      </div>
                 </div>
 
-                {/* 5. AI Recommendations (Refined) */}
+                {/* 5. AI Recommendations */}
                 <div className="mb-16">
                      <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
                         <BookOpen className="w-6 h-6 text-indigo-600" />
-                        Персональный план развития
+                        Ваша стратегия роста
                      </h2>
 
                     {aiRecommendations ? (
@@ -279,7 +358,7 @@ const ResultsScreen = ({
                         </div>
                     ) : (
                          isGeneratingRecommendations ? (
-                             <AILoader message="Анализируем ваши ответы и формируем стратегию роста..." />
+                             <AILoader message="Искусственный интеллект анализирует ваши ответы..." />
                          ) : (
                              <div className="p-8 bg-slate-50 rounded-3xl border border-slate-200 text-center text-slate-500">
                                  Рекомендации недоступны
