@@ -106,16 +106,15 @@ async def generate_and_save_recommendations(result_id, user, level, overallScore
     try:
         print(f"Generating recommendations for result {result_id}")
         client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        response = await client.responses.create(
-            model="gpt-5.2-mini",
-            reasoning={"effort": "medium"},
-            input=[
+        response = await client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_output_tokens=4000
+            max_tokens=4000
         )
-        recommendations = response.output_text
+        recommendations = response.choices[0].message.content
         print(f"Recommendations generated successfully, length: {len(recommendations)}")
     except Exception as e:
         print(f"Error generating recommendations: {str(e)}")
