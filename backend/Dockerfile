@@ -21,6 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем код приложения
 COPY ./app ./app
 
-EXPOSE 8000
+# Railway использует переменную PORT, но для совместимости используем 8000 по умолчанию
+ENV PORT=8000
+EXPOSE $PORT
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} 
