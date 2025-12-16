@@ -91,7 +91,7 @@ const QuestionScreen = ({
 							<label
 								key={option.value}
 								className={`
-									group relative flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200
+									group relative flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2
 									${
 										isSelected
 											? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600 shadow-sm z-10'
